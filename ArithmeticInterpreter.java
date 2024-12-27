@@ -1,4 +1,3 @@
-// Interpreter for Minimal Subset of Arithmetic Operations in Java (Supports Operator Precedence)
 package project;
 
 import java.util.*;
@@ -6,113 +5,146 @@ import java.util.*;
 public class ArithmeticInterpreter {
 
     public static void main(String[] args) {
-        computeArithmetics("10 + 5 * 2");
+        Interpreter interpreter = new Interpreter();
+        interpreter.getVariables().put("x", 5.0); // Example: Predefined variable x = 5
+        computeArithmetics("x + 10", interpreter);
     }
 
-    public static void computeArithmetics(String expression){
-        expression = expression.trim();
+    public static void computeArithmetics(String expression, Interpreter interpreter) {
+        expression = expression.trim(); // Clean up whitespace from the expression
 
         try {
             // Evaluate and print the result
-            double result = evaluateExpression(expression);
+            double result = evaluateExpression(expression, interpreter);
             System.out.println("Result: " + result);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    public static double evaluateExpression(String expression) throws Exception {
-        // Remove spaces and validate characters
+    public static double evaluateExpression(String expression, Interpreter interpreter) throws Exception {
+        //// Remove unnecessary spaces and check for invalid character
         expression = expression.replaceAll("\\s+", "");
-        if (!expression.matches("[0-9+\\-*/%().]*")) {
+        if (!expression.matches("[0-9a-zA-Z+\\-*/%().]*")) {
             throw new Exception("Invalid characters in expression.");
         }
 
-        // Convert infix expression to postfix
+        // Replace variables in the expression with their actual values
+        expression = substituteVariables(expression, interpreter);
+
+        // Convert the mathematical expression from infix (standard format) to postfix notation
         List<String> postfix = infixToPostfix(expression);
 
-        // Evaluate postfix expression
+        //// Calculate and return the final result from the postfix notation
         return evaluatePostfix(postfix);
     }
+  // Replace variable names in the expression with their assigned values
+    private static String substituteVariables(String expression, Interpreter interpreter) throws Exception {
+        StringBuilder substitutedExpression = new StringBuilder(); // Resulting expression
+        StringBuilder variableName = new StringBuilder(); // Temporary storage for variable names
 
-    //converts the given arithmetic expression to desired structure and calculates its result.
+        for (int i = 0; i < expression.length(); i++) { // Check if character is part of a variable name
+            char c = expression.charAt(i);  // Build variable name
+
+            if (Character.isLetter(c)) {
+                variableName.append(c); 
+            } else {
+                if (variableName.length() > 0) {
+                    String var = variableName.toString();
+                    Object value = interpreter.getValue(var);
+                    if (value == null) {
+                        throw new Exception("Undefined variable: " + var);
+                    }
+                    substitutedExpression.append(value);
+                    variableName.setLength(0); // Reset the variable name builder
+                }
+                substitutedExpression.append(c); // Append the current character (operator/number)
+            }
+        }
+
+        // Handle the case where the last part of the expression is a variable
+        if (variableName.length() > 0) {
+            String var = variableName.toString();
+            Object value = interpreter.getValue(var);
+            if (value == null) {
+                throw new Exception("Undefined variable: " + var);
+            }
+            substitutedExpression.append(value);
+        }
+
+        return substitutedExpression.toString();
+    }
+ // Convert an infix expression to postfix notation 
     private static List<String> infixToPostfix(String expression) {
-        Stack<Character> operators = new Stack<>();
-        List<String> postfix = new ArrayList<>();
-        StringBuilder number = new StringBuilder();
+        Stack<Character> operators = new Stack<>(); // Stack to hold operators
+        List<String> postfix = new ArrayList<>();  // List to store postfix expression
+        StringBuilder number = new StringBuilder();  // Temporary storage for numbers
 
-        //Iterate through each character in the expression
-        for (int i = 0; i < expression.length(); i++) {
+        for (int i = 0; i < expression.length(); i++) {  
             char c = expression.charAt(i);
 
-            // If the character is part of a number or a decimal point, append it
-            if (Character.isDigit(c) || c == '.') {
+            if (Character.isDigit(c) || c == '.') {  // If character is part of a number
                 number.append(c);
             } else {
-                // If a number was being built, add it to the postfix list
-                if (number.length() > 0) {
+                if (number.length() > 0) {  // Add the number to the postfix list when a non-digit character is encountered
                     postfix.add(number.toString());
-                    number.setLength(0); // Reset the number builder
+                    number.setLength(0);
                 }
 
-                // Handle parentheses
                 if (c == '(') {
-                    operators.push(c);
+                    operators.push(c);  // Push '(' onto the operator stack
                 } else if (c == ')') {
-                    // add operators to postfix until the matching '(' is found,so anything that's between parentheses
+                    // Pop operators until '(' is found
                     while (!operators.isEmpty() && operators.peek() != '(') {
                         postfix.add(String.valueOf(operators.pop()));
                     }
-                    operators.pop(); // Remove '('
+                    operators.pop();  // Remove '('
                 } else if (isOperator(c)) {
-                    // checking which operator has more priority to execute it first.
+                     // Pop operators with higher or equal precedence
                     while (!operators.isEmpty() && precedence(operators.peek()) >= precedence(c)) {
-                        //add it to postfix according to the priorities.
                         postfix.add(String.valueOf(operators.pop()));
                     }
-                    operators.push(c); // otherwise save it for later
+                    operators.push(c); // Push the current operator
                 }
             }
         }
-        // Add any remaining number to the postfix list
+        
+         // Add any remaining number to the postfix list
         if (number.length() > 0) {
             postfix.add(number.toString());
         }
-
-        // Pop all remaining operators and add them to the postfix list
+        // Add remaining operators to the postfix list
         while (!operators.isEmpty()) {
             postfix.add(String.valueOf(operators.pop()));
         }
 
         return postfix;
     }
-
-    //evaluates postfix expression and calculates the result
+    
+    // Evaluate a postfix expression and calculate the result
     private static double evaluatePostfix(List<String> postfix) {
         Stack<Double> stack = new Stack<>();
 
-        // Iterate through each token in the postfix expression
         for (String token : postfix) {
             if (isNumeric(token)) {
-                // Push numbers onto the stack
                 stack.push(Double.parseDouble(token));
             } else if (isOperator(token.charAt(0))) {
-                // Pop two numbers and apply the operator
+                // Pop two operands and apply the operator
                 double b = stack.pop();
                 double a = stack.pop();
                 stack.push(applyOperator(a, b, token.charAt(0)));
             }
         }
-        // The remaining item in the stack is the result
+
         return stack.pop();
     }
-
-    // Checks if the given character is a valid arithmetic operator.
+    
+ // Check if a character is a mathematical operator
     private static boolean isOperator(char c) {
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
     }
-
-    // prioritizes given operators
+    
+ // Determine  which operator has bigger priority
     private static int precedence(char operator) {
         switch (operator) {
             case '+':
@@ -126,8 +158,8 @@ public class ArithmeticInterpreter {
                 return 0;
         }
     }
-
-    //checks if the given string is numeric.
+    
+    // Check if a string represents a numeric value
     private static boolean isNumeric(String str) {
         try {
             Double.parseDouble(str);
@@ -136,8 +168,8 @@ public class ArithmeticInterpreter {
             return false;
         }
     }
-
-    // Applies an operator to two numbers and returns the result.
+    
+    // Apply a mathematical operator to two operands
     private static double applyOperator(double a, double b, char operator) {
         switch (operator) {
             case '+':
