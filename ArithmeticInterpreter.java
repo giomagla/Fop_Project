@@ -6,27 +6,19 @@ import java.util.*;
 public class ArithmeticInterpreter {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        computeArithmetics("10 + 5 * 2");
+    }
 
-        while (true) {
-            // ask the user to give you arithmetic expression repeatedly
-            System.out.print("Enter arithmetic expression (or 'exit' to quit): ");
-            String expression = scanner.nextLine().trim();
-            // exit the loop if input says exit
-            if (expression.equalsIgnoreCase("exit")) {
-                break;
-            }
+    public static void computeArithmetics(String expression){
+        expression = expression.trim();
 
-            try {
-                // Evaluate and print the result
-                double result = evaluateExpression(expression);
-                System.out.println("Result: " + result);
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-            }
+        try {
+            // Evaluate and print the result
+            double result = evaluateExpression(expression);
+            System.out.println("Result: " + result);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        //close the scanner
-        scanner.close();
     }
 
     public static double evaluateExpression(String expression) throws Exception {
