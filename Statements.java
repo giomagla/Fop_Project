@@ -8,25 +8,31 @@ public class Statements {
     public Statements(Interpreter interpreter) {
         this.interpreter = interpreter;
     }
-
+    //this is function print(...)
     public void toBePrinted(String block) {
         int start = block.indexOf("(") + 1;
         int end = block.indexOf(")");
+        //checking if it is string
         if (block.charAt(start) == '"' && block.charAt(end - 1) == '"') {
             String toBePrinted = block.substring(start + 1, end - 1);
             System.out.println(toBePrinted);
-        } else if (start > 0 && end > start) {
+        }
+        //checking if it is variable
+        else if (start > 0 && end > start) {
             String value = block.substring(start, end).trim();
-            if (interpreter.getVariables().containsKey(value)) {
+            if (interpreter.getVariables().containsKey(value)) {//if the variable exists, get it
                 System.out.println(interpreter.getValue(value));
             }
+            else {
+                System.out.println("Error! provided variable does not exist!");
+            }
         }
-
     }
 
     public void conditionalStatements(String code) {
         boolean istrue = false;
         Statements statements = new Statements(interpreter);
+        //check if provided code is if statement
         if (code.startsWith("if")) {
             code.substring(2).trim();
             if (!code.endsWith(":")) {
@@ -41,6 +47,7 @@ public class Statements {
                 return;
             }
             String variableName = condition[1];
+            //if variable exists get it, if not error
             try {
                 interpreter.getValue(variableName);
             } catch (NullPointerException nullPointerException) {
@@ -52,7 +59,8 @@ public class Statements {
                 while (true) {
                     Scanner scanner = new Scanner(System.in);
                     String block = scanner.nextLine();
-                    if (!block.startsWith("    ") && !block.startsWith("\t")) {
+                    if (!block.startsWith("    ") && !block.startsWith("\t")) {//must be space sensitively,
+                        //if not, exit if block and notify it
                         if (block.startsWith("print")) {
                             System.out.println("You are out of the if block");
                             statements.toBePrinted(block);
@@ -75,6 +83,7 @@ public class Statements {
                 }
             }
             istrue = isConditiontrue(variableName, operator, value);
+            //if this is true, when writing else block, it will not exicute because of this boolean
         }
         if (code.startsWith("else:")) {
             if (!code.endsWith(":")) {
@@ -90,6 +99,7 @@ public class Statements {
                     interpreter.evaluate(elseCode);
                 }
             } else if (istrue) {
+                //right here
                 System.out.println("error!, \"if\" condition was right");
             }
         } else if (code.startsWith("print")) {
@@ -103,6 +113,7 @@ public class Statements {
 
     public boolean isConditiontrue(String variableName, String operator, String value) {
         int variablesValue = 0;
+        //checking if thing to compare is integer, if not error
         try {
             variablesValue = (int) interpreter.getValue(variableName);
         } catch (NullPointerException npe) {
@@ -110,6 +121,7 @@ public class Statements {
         }
         int intValue = Integer.parseInt(value);
         switch (operator) {
+            //checking all operators that are legal
             case "==":
                 return variablesValue == intValue;
             case "!=":
@@ -126,6 +138,3 @@ public class Statements {
                 System.out.println("Error: Unsupported operator " + operator);
                 return false;
         }
-    }
-}
-
