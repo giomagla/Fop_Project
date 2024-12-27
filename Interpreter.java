@@ -2,6 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Interpreter {
+    ArithmeticInterpreter ai = new ArithmeticInterpreter();
     private final Map<String, Object> variables = new HashMap<>();
 
     public Map<String, Object> getVariables() {
@@ -16,11 +17,18 @@ public class Interpreter {
 
         String[] parts = code.split("=");
         if (parts.length == 2) {
+            Object value;
             String variable = parts[0].trim();
-            Object value = evaluateExpression(parts[1].trim());
+            if (parts[1].length() > 1){
+                 value = ai.computeArithmetics(parts[1],this);
+            }
+            else {
+                 value = evaluateExpression(parts[1].trim());
+            }
             variables.put(variable, value);
-            System.out.println("Assigned: " + variable + " = " + value);
+            //System.out.println("Assigned: " + variable + " = " + value);
         }
+
     }
 
 
@@ -60,4 +68,3 @@ public class Interpreter {
         return newExp;
     }
 }
-
