@@ -1,5 +1,3 @@
-package project;
-
 import java.util.*;
 
 public class ArithmeticInterpreter {
@@ -7,19 +5,19 @@ public class ArithmeticInterpreter {
     public static void main(String[] args) {
         Interpreter interpreter = new Interpreter();
         interpreter.getVariables().put("x", 5.0); // Example: Predefined variable x = 5
-        computeArithmetics("x + 10", interpreter);
+
     }
 
-    public static void computeArithmetics(String expression, Interpreter interpreter) {
+    public String  computeArithmetics(String expression, Interpreter interpreter) {
         expression = expression.trim(); // Clean up whitespace from the expression
-
+        int result = 0;
         try {
             // Evaluate and print the result
-            double result = evaluateExpression(expression, interpreter);
-            System.out.println("Result: " + result);
+             result = (int) evaluateExpression(expression, interpreter);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
+        return String.valueOf(result);
     }
 
     public static double evaluateExpression(String expression, Interpreter interpreter) throws Exception {
@@ -38,7 +36,7 @@ public class ArithmeticInterpreter {
         //// Calculate and return the final result from the postfix notation
         return evaluatePostfix(postfix);
     }
-  // Replace variable names in the expression with their assigned values
+    // Replace variable names in the expression with their assigned values
     private static String substituteVariables(String expression, Interpreter interpreter) throws Exception {
         StringBuilder substitutedExpression = new StringBuilder(); // Resulting expression
         StringBuilder variableName = new StringBuilder(); // Temporary storage for variable names
@@ -47,7 +45,7 @@ public class ArithmeticInterpreter {
             char c = expression.charAt(i);  // Build variable name
 
             if (Character.isLetter(c)) {
-                variableName.append(c); 
+                variableName.append(c);
             } else {
                 if (variableName.length() > 0) {
                     String var = variableName.toString();
@@ -74,13 +72,13 @@ public class ArithmeticInterpreter {
 
         return substitutedExpression.toString();
     }
- // Convert an infix expression to postfix notation 
+    // Convert an infix expression to postfix notation
     private static List<String> infixToPostfix(String expression) {
         Stack<Character> operators = new Stack<>(); // Stack to hold operators
         List<String> postfix = new ArrayList<>();  // List to store postfix expression
         StringBuilder number = new StringBuilder();  // Temporary storage for numbers
 
-        for (int i = 0; i < expression.length(); i++) {  
+        for (int i = 0; i < expression.length(); i++) {
             char c = expression.charAt(i);
 
             if (Character.isDigit(c) || c == '.') {  // If character is part of a number
@@ -100,7 +98,7 @@ public class ArithmeticInterpreter {
                     }
                     operators.pop();  // Remove '('
                 } else if (isOperator(c)) {
-                     // Pop operators with higher or equal precedence
+                    // Pop operators with higher or equal precedence
                     while (!operators.isEmpty() && precedence(operators.peek()) >= precedence(c)) {
                         postfix.add(String.valueOf(operators.pop()));
                     }
@@ -108,8 +106,8 @@ public class ArithmeticInterpreter {
                 }
             }
         }
-        
-         // Add any remaining number to the postfix list
+
+        // Add any remaining number to the postfix list
         if (number.length() > 0) {
             postfix.add(number.toString());
         }
@@ -120,7 +118,7 @@ public class ArithmeticInterpreter {
 
         return postfix;
     }
-    
+
     // Evaluate a postfix expression and calculate the result
     private static double evaluatePostfix(List<String> postfix) {
         Stack<Double> stack = new Stack<>();
@@ -138,13 +136,13 @@ public class ArithmeticInterpreter {
 
         return stack.pop();
     }
-    
- // Check if a character is a mathematical operator
+
+    // Check if a character is a mathematical operator
     private static boolean isOperator(char c) {
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
     }
-    
- // Determine  which operator has bigger priority
+
+    // Determine  which operator has bigger priority
     private static int precedence(char operator) {
         switch (operator) {
             case '+':
@@ -158,7 +156,7 @@ public class ArithmeticInterpreter {
                 return 0;
         }
     }
-    
+
     // Check if a string represents a numeric value
     private static boolean isNumeric(String str) {
         try {
@@ -168,7 +166,7 @@ public class ArithmeticInterpreter {
             return false;
         }
     }
-    
+
     // Apply a mathematical operator to two operands
     private static double applyOperator(double a, double b, char operator) {
         switch (operator) {
