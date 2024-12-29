@@ -68,14 +68,14 @@ public class Statements {
             } else {
                 //if variable exists get it, if not error
 
-                try {
-                   interpreter.getValue(variableName);
-                } catch (NullPointerException nullPointerException) {
-                    System.out.println("Provided variable does not exists");
-                }
                 variableName = condition[1];
                 operator = condition[2];
                 value = condition[3];
+                try {
+                    interpreter.getValue(variableName);
+                } catch (NullPointerException nullPointerException) {
+                    System.out.println("Provided variable does not exists");
+                }
             }
             if (isConditiontrue(variableName, operator, value,isIt6)) {
                 while (true) {
@@ -138,15 +138,21 @@ public class Statements {
         //checking if thing to compare is integer, if not error
         if (!isIt6) {
             try {
-                variablesValue = (int) interpreter.getValue(variableName);
-            } catch (NullPointerException npe) {
+                variablesValue = Integer.parseInt((String) interpreter.getValue(variableName));
+            } catch (ClassCastException cce) {
                 System.out.println("can not compare null to something, " + variableName + " is null");
             }
         }
         else {
             variablesValue = Integer.parseInt(variableName);
         }
-        int intValue = Integer.parseInt(value);
+        int intValue = 0;
+        if(value.matches("-?\\d+")){
+            intValue = Integer.parseInt(value);
+        }
+        else {
+            intValue = Integer.parseInt((String) interpreter.getValue(value));
+        }
         switch (operator) {
             //checking all operators that are legal
             case "==":
