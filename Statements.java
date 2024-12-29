@@ -78,7 +78,7 @@ public class Statements {
                 }
             }
             if (isConditiontrue(variableName, operator, value, isIt6)) {
-                System.out.println("Enter the block of code (end with a single line 'end'):");
+                System.out.println("Enter the block of code (end with a single line 'runIf'):");
                 StringBuilder block = new StringBuilder();
                 while (true) {
                     String line = new Scanner(System.in).nextLine();
