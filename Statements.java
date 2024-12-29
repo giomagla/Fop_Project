@@ -77,54 +77,58 @@ public class Statements {
                     System.out.println("Provided variable does not exists");
                 }
             }
-            if (isConditiontrue(variableName, operator, value,isIt6)) {
+            if (isConditiontrue(variableName, operator, value, isIt6)) {
+                System.out.println("Enter the block of code (end with a single line 'end'):");
+                StringBuilder block = new StringBuilder();
                 while (true) {
-                    Scanner scanner = new Scanner(System.in);
-                    String block = scanner.nextLine();
-                    if (!block.startsWith("    ") && !block.startsWith("\t")) {//must be space sensitively,
-                        //if not, exit if block and notify it
-                        if (block.startsWith("print")) {
-                            System.out.println("You are out of the if block");
-                            statements.toBePrinted(block);
-                        } else if (block.startsWith("if")) {
-                            System.out.println("You are out of the if block");
-                            conditionalStatements(block);
-                        } else if (block.startsWith("else:")) {
-                            code = block;
-                            System.out.println("You are out of the if block");
-                        } else
-                            System.out.println("You are out of the if block");
-                        interpreter.evaluate(block);
+                    String line = new Scanner(System.in).nextLine();
+                    if (line.equals("runIf")) {
                         break;
                     }
-                    if (block.startsWith("    print") || block.startsWith("\tprint")) {
-                        statements.toBePrinted(block);
+                    block.append(line).append("\n");
+                }
+
+                String[] blockLines = block.toString().split("\n");
+                for (String blockLine : blockLines) {
+                    if (blockLine.startsWith("    print") || blockLine.startsWith("\tprint")) {
+                        statements.toBePrinted(blockLine.trim());
                     } else {
-                        interpreter.evaluate(block);
+                        interpreter.evaluate(blockLine.trim());
                     }
                 }
             }
+
             istrue = isConditiontrue(variableName, operator, value,isIt6);
             //if this is true, when writing else block, it will not exicute because of this boolean
         }
         if (code.startsWith("else:")) {
             if (!code.endsWith(":")) {
-                System.out.println("Incorrect syntax,\":\" expected");
+                System.out.println("Incorrect syntax, \":\" expected");
                 return;
             }
-            Scanner scanner = new Scanner(System.in);
-            String elseCode = scanner.nextLine();
-            if (!istrue) {
-                if (elseCode.startsWith("    print") || elseCode.startsWith("\tprint")) {
-                    statements.toBePrinted(elseCode);
-                } else {
-                    interpreter.evaluate(elseCode);
+            StringBuilder block = new StringBuilder();
+            while (true) {
+                String line = new Scanner(System.in).nextLine();
+                if (line.equals("runIf")) {
+                    break;
                 }
-            } else if (istrue) {
-                //right here
+                block.append(line).append("\n");
+            }
+
+            if (!istrue) {
+                String[] blockLines = block.toString().split("\n");
+                for (String blockLine : blockLines) {
+                    if (blockLine.startsWith("    print") || blockLine.startsWith("\tprint")) {
+                        statements.toBePrinted(blockLine.trim());
+                    } else {
+                        interpreter.evaluate(blockLine.trim());
+                    }
+                }
+            } else {
                 System.out.println("error!, \"if\" condition was right");
             }
-        } else if (code.startsWith("print")) {
+        }
+        else if (code.startsWith("print")) {
             statements.toBePrinted(code);
         } else {
             interpreter.evaluate(code);
