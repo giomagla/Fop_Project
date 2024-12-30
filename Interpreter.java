@@ -10,6 +10,9 @@ public class Interpreter {
     }
 
     public Object getValue(Object i) {
+        if (i instanceof Integer){
+            return i;
+        }
         return getVariables().get(i);
     }
 
@@ -19,7 +22,7 @@ public class Interpreter {
         if (parts.length == 2) {
             Object value;
             String variable = parts[0].trim();
-            if (parts[1].length() > 1){
+            if (parts[1].length() > 1 && !parts[1].startsWith(" \"")){
                  value = ai.computeArithmetics(parts[1],this);
             }
             else {
