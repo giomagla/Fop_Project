@@ -17,7 +17,6 @@ public class Loops {
             System.out.println("Error: Invalid while loop syntax.");
             return;
         }
-
         // separate condition from "while" statement
         String conditionExpression = condition.substring(5, condition.length() - 1).trim();
 
@@ -28,7 +27,8 @@ public class Loops {
 
                 // Process nested if statements
                 if (line.startsWith("if")) {
-                    statements.conditionalStatements(line, extractBlock(block, line));
+                    String code = String.valueOf(statements.extractBlock(block, line));
+                    statements.conditionalStatements(code);
                 }
                 // Handle variable assignments
                 else if (line.contains("=")) {
@@ -49,60 +49,55 @@ public class Loops {
             }
         }
     }
-
+    // this evaluates condition of while loop
     private boolean evaluateCondition(String conditionExpression) {
         try {
-            // Split the condition into 3 parts ( x, <, 3)
+            // Split the condition (e.g., "i <= x")
             String[] parts = conditionExpression.split(" ");
             if (parts.length != 3) {
-                System.out.println("Error: Invalid condition syntax");
+                System.out.println("Error: Invalid condition format");
                 return false;
             }
 
-            // Extract the variable, operator, and value
-            String variable = parts[0].trim();
-            String operator = parts[1].trim();
-            String value = parts[2].trim();
+            Object leftOperand = parts[0].trim(); // e.g., "i"
+            String operator = parts[1].trim();   // e.g., "<="
+            Object rightOperand = parts[2].trim(); // e.g., "x"
 
-            // Get the current value of the variable
-            Object variableValueObj = interpreter.getValue(variable);
+            // Retrieve the values of the operands from the variables map
+            Object leftValueObj = interpreter.getValue(leftOperand);
+            Object rightValueObj = interpreter.getValue(rightOperand);
 
-            if (variableValueObj == null) {
-                System.out.println("Error: Variable '" + variable + "' does not exist or is null");
+            if (leftValueObj == null || rightValueObj == null) {
+                System.out.println("Error: Undefined variable in condition");
                 return false;
             }
 
-            // Convert variable value and target value to integers (if applicable)
-            int variableValue;
-            int targetValue;
+            // Parse the operand values as integers
+            int leftValue = Integer.parseInt(leftValueObj.toString());
+            int rightValue = Integer.parseInt(rightValueObj.toString());
 
-            try {
-                variableValue = Integer.parseInt(variableValueObj.toString());
-                targetValue = Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                System.out.println("Error: Non-numeric values cannot be compared");
-                return false;
-            }
-
-            // Evaluate the condition
-            // replases enhanced switch
+            // Perform the comparison based on the operator
             return switch (operator) {
-                case "<" -> variableValue < targetValue;
-                case "<=" -> variableValue <= targetValue;
-                case ">" -> variableValue > targetValue;
-                case ">=" -> variableValue >= targetValue;
-                case "==" -> variableValue == targetValue;
-                case "!=" -> variableValue != targetValue;
+                case "<" -> leftValue < rightValue;
+                case "<=" -> leftValue <= rightValue;
+                case ">" -> leftValue > rightValue;
+                case ">=" -> leftValue >= rightValue;
+                case "==" -> leftValue == rightValue;
+                case "!=" -> leftValue != rightValue;
                 default -> {
-                    System.out.println("Error: Unsupported operator '" + operator + "'");
+                    System.out.println("Error: Unsupported operator in condition");
                     yield false;
                 }
             };
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Non-numeric values cannot be compared");
+            return false;
         } catch (Exception e) {
             System.out.println("Error evaluating condition: " + e.getMessage());
             return false;
         }
     }
+
 
 
     private boolean isArithmeticExpression(String line) {
@@ -117,9 +112,8 @@ public class Loops {
     private List<String> extractBlock(List<String> lines, String start) {
         int startIndex = lines.indexOf(start);
         if (startIndex == -1) {
-            return List.of(); // Return an empty list if the block cannot be found
+            return List.of();
         }
-
         // Collect all lines indented after the current one
         List<String> block = lines.subList(startIndex + 1, lines.size());
         return block.stream()
