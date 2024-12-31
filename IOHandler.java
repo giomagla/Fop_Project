@@ -6,39 +6,6 @@ import java.util.Scanner;mport java.util.*;
 
 public class IOHandler {
 
-    public static void main(String[] args) {
-        // Create an instance of the IOHandler class
-        IOHandler handler = new IOHandler();
-
-        // Test the handler with some example code
-        System.out.println("=== Test Case 1: Simple Input and Print ===");
-        handler.execute("x = input('Enter a number: ')\nprint(f'You entered: {x}')");
-
-        System.out.println("\n=== Test Case 2: Arithmetic Expressions ===");
-        handler.execute("x = 10\ny = 20\nz = x + y\nprint(f'The sum of x and y is: {z}')");
-
-        System.out.println("\n=== Test Case 3: String Assignment and Print ===");
-        handler.execute("name = 'Alice'\nprint(f'Hello, {name}!')");
-
-        System.out.println("\n=== Test Case 4: Multiple Input Variables ===");
-        handler.execute(
-                "first_name = input('Enter your first name: ')\n" +
-                        "last_name = input('Enter your last name: ')\n" +
-                        "print(f'Your full name is {first_name} {last_name}')"
-        );
-
-        System.out.println("\n=== Test Case 5: Undefined Variable ===");
-        handler.execute("print(f'This variable is undefined: {undefinedVar}')");
-
-        System.out.println("\n=== Test Case 6: Invalid Statements ===");
-        handler.execute("random text\nprint('This line should not execute.')");
-
-        System.out.println("\n=== Test Case 7: Floating Point Arithmetic ===");
-        handler.execute("a = 5.5\nb = 2.3\nc = a + b\nprint(f'The result of a + b is: {c}')");
-
-        System.out.println("\n=== Test Case 8: Nested f-strings ===");
-        handler.execute("name = 'Bob'\nage = 30\nprint(f'{name} is {age} years old.')");    }
-
     // A map to store variables (like Python does in its environment)
     private final Map<String, Object> variables = new HashMap<>();
 
