@@ -2,7 +2,8 @@ package project;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;mport java.util.*;
+import java.util.Scanner;
+import java.util.*;
 
 public class IOHandler {
 
