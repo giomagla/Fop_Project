@@ -2,12 +2,6 @@ import java.util.*;
 
 public class ArithmeticInterpreter {
 
-    public static void main(String[] args) {
-        Interpreter interpreter = new Interpreter();
-        interpreter.getVariables().put("x", 5.0); // Example: Predefined variable x = 5
-
-    }
-
     public String  computeArithmetics(String expression, Interpreter interpreter) {
         expression = expression.trim(); // Clean up whitespace from the expression
         int result = 0;
